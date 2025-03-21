@@ -191,3 +191,25 @@ export class AvailablePlacesComponent implements OnInit {
   }
 }
 ```
+
+## Sending data to backend
+
+```
+onSelectPlace(selectedPlace: Place) {
+    this.httpClient.put('http://localhost:3000/user-places', {
+      placeId: selectedPlace.id
+    }).subscribe({
+      next: (resData) => console.log(resData),
+    });
+  }
+```
+
+In the template
+
+```
+@if (places()) {
+  <app-places [places]="places()! " (selectPlace)="onSelectPlace($event)" />
+  } @else if (places()?.length === 0) {
+  <p class="fallback-text">Unfortunately, no places could be found.</p>
+  }
+```
