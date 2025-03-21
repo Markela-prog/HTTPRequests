@@ -25,8 +25,8 @@ export class AvailablePlacesComponent implements OnInit {
     this.isFetching.set(true);
     const subscription = 
       this.placesService.loadAvailablePlaces().subscribe({
-        next: (resData) => {
-          this.places.set(resData.places);
+        next: (places) => {
+          this.places.set(places);
         },
         error: (error) => {
           console.log(error);
@@ -43,7 +43,7 @@ export class AvailablePlacesComponent implements OnInit {
   }
 
   onSelectPlace(selectedPlace: Place) {
-    const subscription = this.placesService.addPlaceToUserPlaces(selectedPlace.id).subscribe({
+    const subscription = this.placesService.addPlaceToUserPlaces(selectedPlace).subscribe({
       next: (resData) => console.log(resData),
     });
 
