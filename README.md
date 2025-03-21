@@ -39,3 +39,74 @@ export class AvailablePlacesComponent implements OnInit {
 ```
 
 **We must subscribe to trigger get request, as get method returns an observable, which will be ignored if no subscription added**
+
+<hr>
+
+You can add config to get methods, for example to get the whole response instead of body:
+
+```
+const subscription = this.httpClient
+      .get<{ places: Place[] }>('http://localhost:3000/places', {
+        observe: 'response'
+      })
+      .subscribe({
+        next: (response) => {
+          console.log(response);
+          console.log(response.body?.places);
+        },
+      });
+```
+
+<hr>
+
+To use response in template, we can save response data into signal:
+
+```
+export class AvailablePlacesComponent implements OnInit {
+  places = signal<Place[] | undefined>(undefined);
+  private httpClient = inject(HttpClient);
+  private destroyRef = inject(DestroyRef);
+
+  ngOnInit() {
+    const subscription = this.httpClient
+      .get<{ places: Place[] }>('http://localhost:3000/places')
+      .subscribe({
+        next: (resData) => {
+          this.places.set(resData.places);
+        },
+      });
+
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
+    });
+  }
+}
+```
+
+We can also use pipes to transform response data into something
+
+```
+export class AvailablePlacesComponent implements OnInit {
+  places = signal<Place[] | undefined>(undefined);
+  private httpClient = inject(HttpClient);
+  private destroyRef = inject(DestroyRef);
+
+  ngOnInit() {
+    const subscription = this.httpClient
+      .get<{ places: Place[] }>('http://localhost:3000/places')
+      .pipe(
+        map((resData) => resData.places)
+      )
+      .subscribe({
+        next: (places) => {
+          this.places.set(places);
+        },
+      });
+
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
+    });
+  }
+}
+```
+
